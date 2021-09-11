@@ -3,7 +3,9 @@ use std::thread;
 use std::sync::{mpsc, Arc};
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
 
+    // Matrix 1
     let mut input = String::new();
     std::io::stdin().read_line(&mut input).expect("failed to readline");
     let n: usize = input.trim().parse().unwrap();
@@ -18,6 +20,7 @@ fn main() {
         }
     }
 
+    // Matrix 2
     input = String::new();
     std::io::stdin().read_line(&mut input).expect("failed to readline");
     let m: usize = input.trim().parse().unwrap();
@@ -32,9 +35,17 @@ fn main() {
         }
     }
 
+    // Time start
     let now = SystemTime::now();
-    // let _mat3 = mat_mul(&mat1, &mat2, n, m);
-    let _mat3 = mat_mul_op(&mat1, &mat2, n, m);
+
+    if args.len()>1{
+        let _mat3 = mat_mul(&mat1, &mat2, n, m);
+    }
+    else{
+        let _mat3 = mat_mul_op(&mat1, &mat2, n, m);
+    }
+
+    // Time end
     match now.elapsed() {
        Ok(elapsed) => {
            println!("Executed in {}s", elapsed.as_secs());
@@ -48,7 +59,6 @@ fn main() {
 }
 
 // Single Threaded
-#[allow(dead_code)]
 fn mat_mul(mat1: &Vec<Vec<usize>>, mat2: &Vec<Vec<usize>>, n: usize, m:usize) -> Vec<Vec<usize>>{
     #[allow(unused_mut)]
     let mut ans:Vec<Vec<usize>> = vec![];
@@ -70,7 +80,6 @@ fn mat_mul(mat1: &Vec<Vec<usize>>, mat2: &Vec<Vec<usize>>, n: usize, m:usize) ->
 }
 
 // Multi Threaded
-#[allow(dead_code)]
 fn mat_mul_op(mat1: &Vec<Vec<usize>>, mat2: &Vec<Vec<usize>>, n: usize, m:usize) -> Vec<Vec<usize>>{
     #[allow(unused_mut)]
     if n!=m{
@@ -89,7 +98,7 @@ fn mat_mul_op(mat1: &Vec<Vec<usize>>, mat2: &Vec<Vec<usize>>, n: usize, m:usize)
         let amat1 = Arc::clone(&amat1);
         let amat2 = Arc::clone(&amat2);
         threads.push( thread::spawn(move || {
-            println!("{} thread started!", th);
+            println!("thread-{} started!", th);
 
             let start = (th*n)/thread_count;
             let end = (n*(th+1))/thread_count;
@@ -119,7 +128,6 @@ fn mat_mul_op(mat1: &Vec<Vec<usize>>, mat2: &Vec<Vec<usize>>, n: usize, m:usize)
         handle.join().unwrap();
     }
 
-    // println!("{:?}", ans);
     return ans; 
 }
 
